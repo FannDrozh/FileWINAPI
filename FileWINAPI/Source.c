@@ -1,61 +1,60 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
+#include <math.h>
 #include <stdio.h>
 
-void f(float a, float b, float c, HANDLE* file)
+void f(float a, float b, float c)
 {
+	HANDLE otv;
+	otv = CreateFile(L"Otvet.txt", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	char text[300];
+	DWORD bytes;
+	int size = 0;
 	float D, x1, x2;
 	D = (b * b) + 4 * a * c;
 	printf("Дискириминант: %f\n", D);
-	//WriteFile(file, "Дискириминант: %f\n", D);
+	//WriteFile(otv, "Дискириминант: %f\n", D, 50, &bytes, NULL);
 	if (D > 0)
 	{
 		x1 = (-b + sqrt(D) / (2 * a));
 		x2 = (-b - sqrt(D) / (2 * a));
-		char lpBuff = "x1=%f\n x2=%f", x1, x2;
-		byte nNumberOfBytesToWrite = 100;
-		Writefile(file, lpBuff, nNumberOfBytesToWrite,NULL);
-		CloseHandle(file);
+		sprintf(text, "x1=%f\n x2=%f", x1, x2);
+		while (text[size] != 0)
+		{
+			size++;
+		}
+		WriteFile(otv, text, size, &bytes, NULL);
 	}
 	else if (D < 0)
 	{
-		printf("Вещественных корней нет");
-		char lpBuff = "Вещественных корней нет";
-		byte nNumberOfBytesToWrite = 100;
-		Writefile(file, lpBuff, nNumberOfBytesToWrite, NULL);
-		CloseHandle(file);
+		WriteFile(otv, "Вещественных корней нет", size, &bytes, NULL);
 	}
 	else if (D = 0)
 	{
 		x1 = (-b + sqrt(D) / (2 / a));
-		printf("x1=%f", x1);
-		char lpBuff = "x1=%f", x1;
-		byte nNumberOfBytesToWrite = 100;
-		Writefile(file, lpBuff, nNumberOfBytesToWrite, NULL);
-		CloseHandle(file);
+		sprintf(text, "x1 = %f", x1);
+		while (text[size] != 0)
+		{
+			size++;
+		}
+		WriteFile(otv, text, size, &bytes, NULL);
 	}
 }
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+
+INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	HANDLE file; HANDLE otv;
-	otv = CreateFile(L"Otvet.txt", GENERIC_READ |
-		GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, CREATE_NEW,
-		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-	file = CreateFile(L"Znach.txt", GENERIC_READ |
-		GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, CREATE_NEW,
-		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-	char line[254];
+	HANDLE file; 
+	file = CreateFile(L"Znach.txt", GENERIC_READ, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	float a, b, c;
 	a = 0; b = 0; c = 0;
 	int lpBuff[] = { a,b,c };
-	byte nNumberOfBytesToWrite = 10;
-	if ((ReadFile(file, lpBuff, nNumberOfBytesToWrite, NULL,NULL)))
+	DWORD size = 100, bytes;
+	char line[254];
+	if (file != INVALID_HANDLE_VALUE)
 	{
-		if (file == INVALID_HANDLE_VALUE)
-		{
-			printf("Could not open file.");
-			return 0;
-		}
+		ReadFile(file, line, size, &bytes, NULL);
+		
 		//A
 		int probelA = 0;
 		int umnA = 1;
@@ -214,7 +213,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		}
 
 	}
-	//f(a, b, c, otv);
+	
+	f(a, b, c);
 }
-
 
